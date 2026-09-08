@@ -11,7 +11,7 @@ pipeline {
     }
 
     stages {
-
+        
         stage('Checkout') {
             steps {
                 checkout scm
@@ -21,13 +21,15 @@ pipeline {
         stage('Prepare Project') {
             steps {
                 sh '''
-                sudo rm -rf $PROJECT_DIR
-                sudo mkdir -p $PROJECT_DIR
+                sudo chmod 755 /home/ubuntu
 
-                sudo cp -r $WORKSPACE/. $PROJECT_DIR/
-                sudo chown -R jenkins:jenkins $PROJECT_DIR
+                sudo rm -rf "$PROJECT_DIR"
+                sudo mkdir -p "$PROJECT_DIR"
 
-                sudo ls -la $PROJECT_DIR
+                sudo cp -r "$WORKSPACE"/. "$PROJECT_DIR"/
+                sudo chown -R jenkins:jenkins "$PROJECT_DIR"
+
+                ls -la "$PROJECT_DIR"
                 '''
             }
         }
@@ -35,7 +37,7 @@ pipeline {
         stage('Create Environment Files') {
             steps {
                 sh '''
-                cd $PROJECT_DIR
+                cd "$PROJECT_DIR"
 
                 cat > .env <<EOF
 MYSQL_ROOT_PASSWORD=root123
@@ -65,7 +67,7 @@ EOF
         stage('Cleanup Docker') {
             steps {
                 sh '''
-                cd $PROJECT_DIR
+                cd "$PROJECT_DIR"
                 docker compose down || true
                 docker system prune -a --volumes --force
                 '''
@@ -75,7 +77,7 @@ EOF
         stage('Build Docker Images') {
             steps {
                 sh '''
-                cd $PROJECT_DIR
+                cd "$PROJECT_DIR"
                 docker compose build --no-cache
                 '''
             }
@@ -84,7 +86,7 @@ EOF
         stage('Deploy Containers') {
             steps {
                 sh '''
-                cd $PROJECT_DIR
+                cd "$PROJECT_DIR"
                 docker compose up -d
                 '''
             }
@@ -93,14 +95,13 @@ EOF
         stage('Verify Deployment') {
             steps {
                 sh '''
-                cd $PROJECT_DIR
+                cd "$PROJECT_DIR"
 
                 echo "Waiting for containers..."
                 sleep 20
 
                 docker ps
                 docker compose ps
-                docker compose logs backend --tail=30 || true
                 '''
             }
         }
@@ -110,9 +111,11 @@ EOF
         success {
             echo 'SUCCESS: Developer Portfolio deployed successfully!'
         }
+
         failure {
             echo 'FAILED: Deployment failed.'
         }
+
         always {
             sh 'docker image prune -f || true'
         }
