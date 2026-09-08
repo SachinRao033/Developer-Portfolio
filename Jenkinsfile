@@ -26,9 +26,15 @@ pipeline {
             steps {
                 sh '''
                 sudo rm -rf $PROJECT_DIR
-                sudo mkdir -p /home/ubuntu
-                sudo cp -r "$WORKSPACE" "$PROJECT_DIR"
+                sudo mkdir -p "$PROJECT_DIR" 
+                
+                # Copy only the project contents 
+                sudo cp -r "$WORKSPACE"/. "$PROJECT_DIR"/ 
+                
                 sudo chown -R ubuntu:ubuntu "$PROJECT_DIR"
+                
+                # Verify 
+                ls -la "$PROJECT_DIR" 
                 '''
             }
         }
@@ -65,7 +71,7 @@ EOF
             }
         }
 
-        stage('Cleanup The Old Docker Containers') {
+        stage('Cleanup Docker') {
             steps {
                 sh '''
                 cd "$PROJECT_DIR"
