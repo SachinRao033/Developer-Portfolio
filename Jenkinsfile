@@ -65,7 +65,7 @@ EOF
             }
         }
 
-        stage('Cleanup Docker') {
+        stage('Cleanup The Old Docker Containers') {
             steps {
                 sh '''
                 cd "$PROJECT_DIR"
