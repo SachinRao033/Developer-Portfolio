@@ -27,7 +27,7 @@ pipeline {
                 sudo cp -r $WORKSPACE/. $PROJECT_DIR/
                 sudo chown -R jenkins:jenkins $PROJECT_DIR
 
-                ls -la $PROJECT_DIR
+                sudo ls -la $PROJECT_DIR
                 '''
             }
         }
