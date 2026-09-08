@@ -42,16 +42,17 @@ pipeline {
         stage('Create Environment Files') {
             steps {
                 sh '''
-                sudo cd "$PROJECT_DIR"
+                sudo bash -c '
+                cd "$PROJECT_DIR"
 
                 # Root .env
-                sudo cat > .env <<EOF
+                cat > .env <<EOF
 MYSQL_ROOT_PASSWORD=root123
 EOF
 
                 # Backend .env
                 mkdir -p App_Server
-                sudo cat > App_Server/.env <<EOF
+                cat > App_Server/.env <<EOF
 MYSQL_URL=mysql+pymysql://root:root123@mysql:3306/portfolio_db
 SESSION_SECRET=portfolio-admin-session-secret-2024
 ADMIN_PASSWORD=admin123
@@ -63,7 +64,7 @@ EOF
 
                 # Frontend .env
                 mkdir -p Portfolio
-                sudo cat > Portfolio/.env <<EOF
+                cat > Portfolio/.env <<EOF
 VITE_API_URL=http://15.207.25.177:8000
 PORT=3000
 EOF
@@ -74,6 +75,7 @@ EOF
         stage('Cleanup Docker') {
             steps {
                 sh '''
+                sudo bash -c '
                 cd "$PROJECT_DIR"
 
                 docker compose down || true
@@ -85,6 +87,7 @@ EOF
         stage('Build Docker Images') {
             steps {
                 sh '''
+                sudo bash -c '
                 cd "$PROJECT_DIR"
                 docker compose build --no-cache
                 '''
@@ -94,6 +97,7 @@ EOF
         stage('Deploy Containers') {
             steps {
                 sh '''
+                sudo bash -c '
                 cd "$PROJECT_DIR"
                 docker compose up -d
                 '''
@@ -103,6 +107,7 @@ EOF
         stage('Verify Deployment') {
             steps {
                 sh '''
+                sudo bash -c '
                 cd "$PROJECT_DIR"
 
                 echo "Waiting for containers..."
