@@ -34,7 +34,7 @@ pipeline {
                 sudo chown -R ubuntu:ubuntu "$PROJECT_DIR"
                 
                 # Verify 
-                ls -la "$PROJECT_DIR" 
+                sudo ls -la "$PROJECT_DIR" 
                 '''
             }
         }
@@ -42,16 +42,16 @@ pipeline {
         stage('Create Environment Files') {
             steps {
                 sh '''
-                cd "$PROJECT_DIR"
+                sudo cd "$PROJECT_DIR"
 
                 # Root .env
-                cat > .env <<EOF
+                sudo cat > .env <<EOF
 MYSQL_ROOT_PASSWORD=root123
 EOF
 
                 # Backend .env
                 mkdir -p App_Server
-                cat > App_Server/.env <<EOF
+                sudo cat > App_Server/.env <<EOF
 MYSQL_URL=mysql+pymysql://root:root123@mysql:3306/portfolio_db
 SESSION_SECRET=portfolio-admin-session-secret-2024
 ADMIN_PASSWORD=admin123
@@ -63,7 +63,7 @@ EOF
 
                 # Frontend .env
                 mkdir -p Portfolio
-                cat > Portfolio/.env <<EOF
+                sudo cat > Portfolio/.env <<EOF
 VITE_API_URL=http://15.207.25.177:8000
 PORT=3000
 EOF
